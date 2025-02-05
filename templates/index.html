@@ -3,12 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sample Flask Website</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Traffic Light Prediction</title>
 </head>
 <body>
-    <h1>Welcome to My Flask Website!</h1>
-    <p>This is a simple webpage served using Flask.</p>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <h1>Traffic Light Prediction</h1>
+    <form method="POST">
+        <label for="red_cars">Number of Red Cars:</label>
+        <input type="number" id="red_cars" name="red_cars" required>
+        <br>
+        <label for="green_cars">Number of Green Cars:</label>
+        <input type="number" id="green_cars" name="green_cars" required>
+        <br>
+        <label for="time_since_changed">Time Since Light Changed (seconds):</label>
+        <input type="number" id="time_since_changed" name="time_since_changed" required>
+        <br><br>
+        <input type="submit" value="Predict">
+    </form>
+
+    {% if prediction is not none %}
+        <h2>Prediction: {% if prediction == 1 %}Change Light{% else %}Keep Light{% endif %}</h2>
+    {% endif %}
 </body>
 </html>

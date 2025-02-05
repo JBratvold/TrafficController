@@ -1,12 +1,19 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+from ai.TrafficController_ai import queryNN
 
 app = Flask(__name__)
 
-# Define a route for the home page
-@app.route('/')
-def home():
-    return render_template('index.html')  # Render the index.html template
+@app.route("/", methods=["GET", "POST"])
+def index():
+    prediction = None
+    if request.method == "POST":
+        numRedCars = int(request.form["red_cars"])
+        numGreenCars = int(request.form["green_cars"])
+        timeSinceChanged = int(request.form["time_since_changed"])
+        
+        prediction = queryNN(numRedCars, numGreenCars, timeSinceChanged)
+        print("Prediction: ",prediction)
+    return render_template("index.html", prediction=prediction)
 
-# Run the app
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
