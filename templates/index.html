@@ -1,27 +1,450 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traffic Light Prediction</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Traffic Light Simulation</title>
+  <style>
+    canvas {
+      background-color: #ccc;
+      display: block;
+      margin: auto;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+      display: block;
+      margin: 10px auto;
+    }
+  </style>
 </head>
 <body>
-    <h1>Traffic Light Prediction</h1>
-    <form method="POST">
-        <label for="red_cars">Number of Red Cars:</label>
-        <input type="number" id="red_cars" name="red_cars" required>
-        <br>
-        <label for="green_cars">Number of Green Cars:</label>
-        <input type="number" id="green_cars" name="green_cars" required>
-        <br>
-        <label for="time_since_changed">Time Since Light Changed (seconds):</label>
-        <input type="number" id="time_since_changed" name="time_since_changed" required>
-        <br><br>
-        <input type="submit" value="Predict">
-    </form>
+  <canvas id="gameCanvas" width="800" height="800"></canvas>
+  <br>
+  <button onclick="changeLight()">Change Light</button>
+  <button onclick="addCar()">Add Random Car</button>
+  
+  <script>
+    // Constants for canvas and layout
+    const CANVAS_MAX = 800;
+    const MIDDLE = CANVAS_MAX / 2;
+    const NORTH_STOP_LINE_Y = 320;
+    const SOUTH_STOP_LINE_Y = 480;
+    const EAST_STOP_LINE_X = 480;
+    const WEST_STOP_LINE_X = 320;
+    
+    const ROAD_COLOUR = "grey";
+    const DIVIDER_COLOUR = "orange";
+    const STOP_LINE_COLOUR = "white";
+    const DASHED_LANE_COLOUR = "darkgrey";
+    
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    let lightStateEW = "green";
+    let lightStateNS = "red";
+    let cars = [];
+    
+    // Draw roads (unchanged)
+    function drawRoads() {
+      ctx.fillStyle = ROAD_COLOUR;
+      ctx.fillRect(340, 0, 120, 800);  // Vertical road
+      ctx.fillRect(0, 340, 800, 120);  // Horizontal road
+    }
+    
+    function drawRoadLines() {
+      // Traffic Divider Lines
+      ctx.setLineDash([]);
+      ctx.strokeStyle = DIVIDER_COLOUR;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(MIDDLE, 320); // North Divider
+      ctx.lineTo(MIDDLE, 0);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(EAST_STOP_LINE_X, MIDDLE); // East Divider
+      ctx.lineTo(CANVAS_MAX, MIDDLE);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(MIDDLE, SOUTH_STOP_LINE_Y); // South Divider
+      ctx.lineTo(MIDDLE, CANVAS_MAX);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(0, MIDDLE); // West Divider
+      ctx.lineTo(WEST_STOP_LINE_X, MIDDLE);
+      ctx.stroke();
+      
+      // Dashed Lane Lines
+      ctx.strokeStyle = DASHED_LANE_COLOUR;
+      ctx.setLineDash([10, 10]);
+      ctx.lineWidth = 2;
+      
+      // Horizontal dashed lines (east/west)
+      ctx.beginPath();
+      ctx.moveTo(0, 370);
+      ctx.lineTo(320, 370);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(0, 430);
+      ctx.lineTo(320, 430);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(480, 370);
+      ctx.lineTo(800, 370);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(480, 430);
+      ctx.lineTo(800, 430);
+      ctx.stroke();
+      
+      // Vertical dashed lines (north/south)
+      ctx.beginPath();
+      ctx.moveTo(370, 0);
+      ctx.lineTo(370, 320);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(370, 480);
+      ctx.lineTo(370, 800);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(430, 0);
+      ctx.lineTo(430, 320);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(430, 480);
+      ctx.lineTo(430, 800);
+      ctx.stroke();
+      
+      // Stop Lines (solid white) inside intersection
+      ctx.setLineDash([]);
+      ctx.strokeStyle = STOP_LINE_COLOUR;
+      ctx.lineWidth = 6;
+      
+      ctx.beginPath();
+      ctx.moveTo(340, 320);
+      ctx.lineTo(460, 320);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(340, 480);
+      ctx.lineTo(460, 480);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(320, 340);
+      ctx.lineTo(320, 460);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(480, 340);
+      ctx.lineTo(480, 460);
+      ctx.stroke();
+    }
+    
+    // Draw spawn zones (unchanged)
+    function drawSpawnZones() {
+      ctx.strokeStyle = "yellow";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      
+      // NORTH SPAWN ZONES (2 zones)
+      ctx.strokeRect(375, 5, 20, 50); // Zone 2: x from 375 to 395, y from 5 to 55
+      ctx.strokeRect(345, 5, 20, 50); // Zone 1: x from 345 to 365, y from 5 to 55
+      
+      // EAST SPAWN ZONES (2 zones)
+      ctx.strokeRect(745, 345, 50, 20); // Zone 1: x from 745 to 795, y from 345 to 365
+      ctx.strokeRect(745, 375, 50, 20); // Zone 2: x from 745 to 795, y from 375 to 395
+      
+      // SOUTH SPAWN ZONES (2 zones)
+      ctx.strokeRect(405, 745, 20, 50); // Zone 1: x from 405 to 425, y from 745 to 795
+      ctx.strokeRect(435, 745, 20, 50); // Zone 2: x from 435 to 455, y from 745 to 795
+      
+      // WEST SPAWN ZONES (2 zones)
+      ctx.strokeRect(5, 435, 50, 20); // Zone 1: x from 5 to 55, y from 435 to 455
+      ctx.strokeRect(5, 405, 50, 20); // Zone 2: x from 5 to 55, y from 405 to 425
+      
+      ctx.setLineDash([]);
+    }
+    
+    // Draw traffic lights (unchanged)
+    function drawTrafficLights() {
+      const lights = [
+        { x: 400, y: 330, direction: 'north', width: 25, height: 5 },
+        { x: 400, y: 470, direction: 'south', width: 25, height: 5 },
+        { x: 330, y: 400, direction: 'west', width: 5, height: 25 },
+        { x: 470, y: 400, direction: 'east', width: 5, height: 25 }
+      ];
+      lights.forEach(light => {
+        ctx.fillStyle = "black";
+        ctx.fillRect(light.x - light.width / 2, light.y - light.height / 2, light.width, light.height);
 
-    {% if prediction is not none %}
-        <h2>Prediction: {% if prediction == 1 %}Change Light{% else %}Keep Light{% endif %}</h2>
-    {% endif %}
+        // Determine whether the traffic light should be green or red for each direction
+        const isGreenNS = lightStateNS === "green";  // North-South light is green
+        const isGreenEW = lightStateEW === "green";  // East-West light is green
+
+        // Set the fill color for North-South light (green or red)
+        if (light.direction === 'north' || light.direction === 'south') {
+            if (isGreenNS) {
+                ctx.fillStyle = "rgb(50,205,50)";  // Green for NS
+            } else {
+                ctx.fillStyle = "red";  // Red for NS
+            }
+        }
+        // Set the fill color for East-West light (green or red)
+        else if (light.direction === 'west' || light.direction === 'east') {
+            if (isGreenEW) {
+                ctx.fillStyle = "rgb(50,205,50)";  // Green for EW
+            } else {
+                ctx.fillStyle = "red";  // Red for EW
+            }
+        }
+
+
+        if (light.direction === 'north') {
+          ctx.beginPath();
+          ctx.arc(light.x, light.y, 10, 0, Math.PI, true);
+          ctx.fill();
+        } else if (light.direction === 'south') {
+          ctx.beginPath();
+          ctx.arc(light.x, light.y, 10, 0, Math.PI, false);
+          ctx.fill();
+        } else if (light.direction === 'west') {
+          ctx.beginPath();
+          ctx.arc(light.x, light.y, 10, Math.PI / 2, Math.PI * 1.5, false);
+          ctx.fill();
+        } else if (light.direction === 'east') {
+          ctx.beginPath();
+          ctx.arc(light.x, light.y, 10, Math.PI / 2, Math.PI * 1.5, true);
+          ctx.fill();
+        }
+      });
+    }
+    
+    // Draw all cars
+    function drawCars() {
+      cars.forEach(car => {
+        ctx.fillStyle = "darkblue";
+        ctx.fillRect(car.x, car.y, car.width, car.height);
+      });
+    }
+    
+    // Update car positions if light is green
+    function updateCars() {
+      cars.forEach(car => {
+        if (lightStateEW === "green") {
+          if (car.direction === "east") car.x -= car.speed;
+          if (car.direction === "west") car.x += car.speed;
+          if (car.direction === "north") {
+            if (car.y > NORTH_STOP_LINE_Y-19) {
+                car.y += car.speed+15;
+            } else {
+                if (car.y < NORTH_STOP_LINE_Y-20) {
+                    car.y += car.speed;
+                }
+                else {
+                    car.y -= 0; 
+                }
+            }
+          }
+          if (car.direction === "south") { //If the car is travelling from the south
+            if (car.y < SOUTH_STOP_LINE_Y) { //If the car has crossed the stop line
+                car.y -= car.speed+15;
+            } else { //If the car has not crossed the stop line
+                if (car.y > SOUTH_STOP_LINE_Y ) {
+                    car.y -= car.speed; 
+                } else {
+                    car.y -= 0;
+                }
+            }
+          } 
+        } else {
+          if (car.direction === "east") {
+            if (car.x < EAST_STOP_LINE_X) { //If the car has crossed the stop line
+                car.x -= car.speed+15;
+            } else { //If the car has not crossed the stop line
+                if (car.x > EAST_STOP_LINE_X+1 ) {
+                    car.x -= car.speed; 
+                } else {
+                    car.x -= 0;
+                }
+            }
+          }
+          if (car.direction === "west") {
+            if (car.x > WEST_STOP_LINE_X-19) { //If the car has crossed the stop line
+                car.x += car.speed+15;
+            } else { //If the car has not crossed the stop line
+                if (car.x < WEST_STOP_LINE_X-20 ) {
+                    car.x += car.speed; 
+                } else {
+                    car.x -= 0;
+                }
+            }
+          }
+          if (car.direction === "north") car.y += car.speed;
+          if (car.direction === "south") car.y -= car.speed;   
+        }
+      });
+    }
+    
+    // Count cars heading east/west and north/south that have not crossed the intersection stop lines.
+    function countCars() {
+      const eastWestCount = cars.filter(car => {
+        if (car.direction === "east" && car.x > EAST_STOP_LINE_X) return true;
+        if (car.direction === "west" && car.x < WEST_STOP_LINE_X) return true;
+        return false;
+      }).length;
+      
+      const northSouthCount = cars.filter(car => {
+        if (car.direction === "north" && car.y < NORTH_STOP_LINE_Y) return true;
+        if (car.direction === "south" && car.y > SOUTH_STOP_LINE_Y) return true;
+        return false;
+      }).length;
+      
+    //   console.log("East-West count (not in intersection):", eastWestCount);
+    //   console.log("North-South count (not in intersection):", northSouthCount);
+    }
+    
+    // Main update loop
+    function update() {
+      ctx.clearRect(0, 0, CANVAS_MAX, CANVAS_MAX);
+      drawRoads();
+      drawRoadLines();
+      drawSpawnZones();
+      updateCars();
+      drawCars();
+      drawTrafficLights();
+      countCars();
+    }
+    
+    // Toggle light state
+    function changeLight() {
+      if (lightStateEW === "green") {
+        lightStateEW = "red";
+        lightStateNS = "green";
+      } else {
+        lightStateEW = "green";
+        lightStateNS = "red";
+      }
+    }
+    
+    // Add a random car (existing functionality)
+    function addCar() {
+      const randomDirection = ["east", "west", "north", "south"][Math.floor(Math.random() * 4)];
+      addCarFrom(randomDirection);
+    }
+    
+    // Check if the new car's area is clear (at least 2px distance from any existing car)
+    function isAreaClear(newCar) {
+      for (let other of cars) {
+        if (
+          newCar.x < other.x + other.width + 2 &&
+          newCar.x + newCar.width > other.x - 2 &&
+          newCar.y < other.y + other.height + 2 &&
+          newCar.y + newCar.height > other.y - 2
+        ) {
+          return false;
+        }
+      }
+      return true;
+    }
+    
+    // Spawn a car in a given direction at preset spawn positions.
+    // Now takes optional spawnX and spawnY parameters.
+    function addCarFrom(direction, spawnX, spawnY) {
+      let newCar = {};
+      if (direction === "north") {
+        newCar = { width: 10, height: 20, speed: 2, direction: direction };
+        newCar.x = (spawnX !== undefined) ? spawnX : (Math.random() < 0.5 ? 350 : 380);
+        newCar.y = (spawnY !== undefined) ? spawnY : 10;
+      } else if (direction === "south") {
+        newCar = { width: 10, height: 20, speed: 2, direction: direction };
+        newCar.x = (spawnX !== undefined) ? spawnX : (Math.random() < 0.5 ? 410 : 440);
+        newCar.y = (spawnY !== undefined) ? spawnY : 770;
+      } else if (direction === "east") {
+        newCar = { width: 20, height: 10, speed: 2, direction: direction };
+        newCar.x = (spawnX !== undefined) ? spawnX : 770;
+        newCar.y = (spawnY !== undefined) ? spawnY : (Math.random() < 0.5 ? 350 : 380);
+      } else if (direction === "west") {
+        newCar = { width: 20, height: 10, speed: 2, direction: direction };
+        newCar.x = (spawnX !== undefined) ? spawnX : 10;
+        newCar.y = (spawnY !== undefined) ? spawnY : (Math.random() < 0.5 ? 440 : 410);
+      }
+      
+      // Only add the car if the area is clear (at least 2px away from existing cars)
+      if (isAreaClear(newCar)) {
+        cars.push(newCar);
+      } else {
+        console.log("Spawn blocked: too close to an existing car.");
+      }
+    }
+    
+    // Canvas click listener: if user clicks within a spawn zone, spawn a car at that zone's predetermined coordinates.
+    canvas.addEventListener('click', function(event) {
+      const { pageX, pageY } = event;
+      const { left, top } = canvas.getBoundingClientRect();
+      const canvasX = pageX - left;
+      const canvasY = pageY - top;
+      console.log("Clicked:", canvasX, canvasY);
+      
+      // Check North spawn zones:
+      // Zone 1: x in [345,365], y in [5,55] -> spawn at (355,30)
+      if (canvasX >= 345 && canvasX <= 365 && canvasY >= 5 && canvasY <= 55) {
+        addCarFrom("north", 350, 10);
+        return;
+      }
+      // Zone 2: x in [375,395], y in [5,55] -> spawn at (385,30)
+      if (canvasX >= 375 && canvasX <= 395 && canvasY >= 5 && canvasY <= 55) {
+        addCarFrom("north", 380, 10);
+        return;
+      }
+      
+      // Check South spawn zones:
+      // Zone 1: x in [405,425], y in [745,795] -> spawn at (415,770)
+      if (canvasX >= 405 && canvasX <= 425 && canvasY >= 745 && canvasY <= 795) {
+        addCarFrom("south", 410, 770);
+        return;
+      }
+      // Zone 2: x in [435,455], y in [745,795] -> spawn at (445,770)
+      if (canvasX >= 435 && canvasX <= 455 && canvasY >= 745 && canvasY <= 795) {
+        addCarFrom("south", 440, 770);
+        return;
+      }
+      
+      // Check East spawn zones:
+      // Zone 1: x in [745,795], y in [345,365] -> spawn at (770,355)
+      if (canvasX >= 745 && canvasX <= 795 && canvasY >= 345 && canvasY <= 365) {
+        addCarFrom("east", 770, 350);
+        return;
+      }
+      // Zone 2: x in [745,795], y in [375,395] -> spawn at (770,385)
+      if (canvasX >= 745 && canvasX <= 795 && canvasY >= 375 && canvasY <= 395) {
+        addCarFrom("east", 770, 380);
+        return;
+      }
+      
+      // Check West spawn zones:
+      // Zone 1: x in [5,55], y in [435,455] -> spawn at (30,445)
+      if (canvasX >= 5 && canvasX <= 55 && canvasY >= 435 && canvasY <= 455) {
+        addCarFrom("west", 10, 440);
+        return;
+      }
+      // Zone 2: x in [5,55], y in [405,425] -> spawn at (30,415)
+      if (canvasX >= 5 && canvasX <= 55 && canvasY >= 405 && canvasY <= 425) {
+        addCarFrom("west", 10, 410);
+        return;
+      }
+    });
+    
+    setInterval(update, 50);
+  </script>
 </body>
 </html>
