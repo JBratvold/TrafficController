@@ -272,12 +272,15 @@ function countCars() {
   }).length;
 
     // Set font and style
-    ctx.font = "20px Arial";
-    ctx.fillStyle = "black";  // Change color as needed
+    ctx.font = "25px 'Roboto', sans-serif";
+    ctx.fillStyle = "white";  // Change color as needed
 
     // Draw the counts on the canvas
-    ctx.fillText(`East-West Count: ${eastWestCount}`, 10, 30);  // Positioning (x, y)
-    ctx.fillText(`North-South Count: ${northSouthCount}`, 10, 60); // Positioning (x, y)
+    ctx.fillText(`${eastWestCount}`, 10, 30);  // Positioning (x, y)
+    ctx.fillText(`${northSouthCount}`, 10, 60); // Positioning (x, y)
+    ctx.fillText(`(East/West)`, 60, 30);  // New position (x, y)
+    ctx.fillText(`(North/South)`, 60, 60);  // New position (x, y)
+
   
 //   console.log("East-West count (not in intersection):", eastWestCount);
 //   console.log("North-South count (not in intersection):", northSouthCount);
@@ -371,7 +374,8 @@ const { pageX, pageY } = event;
 const { left, top } = canvas.getBoundingClientRect();
 const canvasX = pageX - left;
 const canvasY = pageY - top;
-console.log("Clicked:", canvasX, canvasY);
+
+// console.log("Clicked:", canvasX, canvasY);
 
 // Loop through spawn zones
 for (const direction in spawnZones) {
