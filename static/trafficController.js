@@ -13,9 +13,17 @@ const DASHED_LANE_COLOUR = "darkgrey";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+let secondsSinceTraffic = 0; // Track seconds since last light change
 let lightStateEW = "green";
 let lightStateNS = "red";
 let cars = [];
+
+
+
+// Update the timer every second
+setInterval(() => {
+    secondsSinceTraffic++;
+}, 1000);
 
 // Define car spawn zones for each direction
 const spawnZones = {
@@ -274,12 +282,14 @@ function countCars() {
     // Set font and style
     ctx.font = "25px sans-serif";
     ctx.fillStyle = "Red";  // Change color as needed
-
+    secondsSinceTraffic
     // Draw the counts on the canvas
     ctx.fillText(`${eastWestCount}`, 10, 30);  // Positioning (x, y)
     ctx.fillText(`${northSouthCount}`, 10, 60); // Positioning (x, y)
-    ctx.fillText(`(East/West)`, 60, 30);  // New position (x, y)
-    ctx.fillText(`(North/South)`, 60, 60);  // New position (x, y)
+    ctx.fillText(`${secondsSinceTraffic}`, 10, 90); // Positioning (x, y)
+    ctx.fillText(`East/West`, 60, 30);  // New position (x, y)
+    ctx.fillText(`North/South`, 60, 60);  // New position (x, y)
+    ctx.fillText(`Last Light Change`, 60, 90);  // New position (x, y)
 
   
 //   console.log("East-West count (not in intersection):", eastWestCount);
@@ -307,6 +317,8 @@ function changeLight() {
     lightStateEW = "green";
     lightStateNS = "red";
   }
+
+  secondsSinceTraffic = 0; // Reset timer when lights change
 }
 
 // Add a random car
