@@ -21,7 +21,7 @@ def receive_traffic_data():
 
     # Query the neural network with the received data
     prediction = queryNN(redCars, greenCars, timeSinceChanged)
-    print(prediction)
+    
     # Return the prediction as a JSON response
     return jsonify({"prediction": prediction})
 

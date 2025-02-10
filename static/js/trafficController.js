@@ -448,7 +448,7 @@ function sendTrafficDataToBackend() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("Received prediction:", data.prediction);
+        // console.log("Received prediction:", data.prediction);
         // You can use the prediction to update the traffic light or log it
         if(data.prediction === 1) changeLight();
         
@@ -456,8 +456,6 @@ function sendTrafficDataToBackend() {
     .catch(error => {
         console.error("Error sending data to the backend:", error);
     });
-
-    console.log("Data sent:".data)
 }
 
 // Function to toggle the paused state
