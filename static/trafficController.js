@@ -13,16 +13,19 @@ const DASHED_LANE_COLOUR = "darkgrey";
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
-let secondsSinceTraffic = 0; // Track seconds since last light change
+let secondsSinceLightChange = 0; // Track seconds since last light change
+let redLightCarsCount = 0;
+let greenLightCarsCount = 0;
 let lightStateEW = "green";
 let lightStateNS = "red";
 let cars = [];
+let predictionToChange = true;
 
 
 
 // Update the timer every second
 setInterval(() => {
-    secondsSinceTraffic++;
+    secondsSinceLightChange++;
 }, 1000);
 
 // Define car spawn zones for each direction
@@ -280,7 +283,7 @@ function countCars() {
   }).length;
 
 
-  const redLightCarsCount = cars.filter(car => {
+  redLightCarsCount = cars.filter(car => {
     if (car.direction === "north" && car.y <= NORTH_STOP_LINE_Y && lightStateNS === "red") return true;
     if (car.direction === "south" && car.y >= SOUTH_STOP_LINE_Y && lightStateNS === "red") return true;
     if (car.direction === "east" && car.x >= EAST_STOP_LINE_X && lightStateEW === "red") return true;
@@ -288,7 +291,7 @@ function countCars() {
     return false;
   }).length
 
-  const greenLightCarsCount = cars.filter(car => {
+  greenLightCarsCount = cars.filter(car => {
     if (car.direction === "north" && car.y <= NORTH_STOP_LINE_Y && lightStateNS === "green") return true;
     if (car.direction === "south" && car.y >= SOUTH_STOP_LINE_Y && lightStateNS === "green") return true;
     if (car.direction === "east" && car.x >= EAST_STOP_LINE_X && lightStateEW === "green") return true;
@@ -304,7 +307,7 @@ function countCars() {
     // Draw the counts on the canvas
     ctx.fillText(`${redLightCarsCount}`, 10, 30);  // Positioning (x, y)
     ctx.fillText(`${greenLightCarsCount}`, 10, 60); // Positioning (x, y)
-    ctx.fillText(`${secondsSinceTraffic}`, 10, 90); // Positioning (x, y)
+    ctx.fillText(`${secondsSinceLightChange}`, 10, 90); // Positioning (x, y)
     ctx.fillText(`(Red Light Cars)`, 60, 30);  // New position (x, y)
     ctx.fillText(`(Green Light Cars)`, 60, 60);  // New position (x, y)
     ctx.fillText(`(Seconds)`, 60, 90);  // New position (x, y)
@@ -338,7 +341,7 @@ function changeLight() {
     lightStateNS = "red";
   }
 
-  secondsSinceTraffic = 0; // Reset timer when lights change
+  secondsSinceLightChange = 0; // Reset timer when lights change
 }
 
 // Add a random car
@@ -425,6 +428,36 @@ for (const direction in spawnZones) {
 }
 });
 
+// Function to send traffic data to Flask backend
+function sendTrafficDataToBackend() {
+    // Prepare the traffic data to be sent
+    const trafficData = {
+        red: redLightCarsCount,  // Number of cars at a red light (East-West)
+        green: greenLightCarsCount,  // Number of cars at a green light (North-South)
+        seconds: secondsSinceLightChange  // Time since the last light change
+    };
 
+    // Send data to Flask API using fetch
+    fetch('/traffic_data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(trafficData)  // Send the data as JSON
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Received prediction:", data.prediction);
+        // You can use the prediction to update the traffic light or log it
+        if(data.prediction === 1) changeLight();
+        
+    })
+    .catch(error => {
+        console.error("Error sending data to the backend:", error);
+    });
 
+    console.log("Data sent:".data)
+}
+
+setInterval(sendTrafficDataToBackend,5000);
 setInterval(update, 50);
