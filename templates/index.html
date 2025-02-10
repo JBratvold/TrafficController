@@ -1,138 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="static/css/splash.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <title>Traffic Light Simulation</title>
-  <style>
-    /* Set the background image for the body */
-    /* E:\Joshua Bratvold\Hobbies & Fun\Websites\TrafficController\TrafficController\static\img\ */
-    body {
-        background-image: url('static/img/background.png');
-        background-size: cover; /* Ensure the image covers the entire background */
-        background-position: center center; /* Center the image */
-        background-attachment: fixed; /* Make the background fixed as you scroll */
-        background-repeat: no-repeat; /* Prevent the image from repeating */
-        image-rendering: crisp-edges; /* Ensure sharpness of the image */
-    }
+    <title>AI Traffic Controller</title>
 
-    /* Adjust the canvas to be responsive */
-    .canvas-wrapper {
-      display: flex;
-      justify-content: center;
-      margin: 0 auto;
-      max-width: 100%; /* Ensure it doesn't exceed the screen width */
-    }
+    <!-- Meta's -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="JBratvold" />
+    <meta name="description" content="Traffic controller simulation controlled by AI." />
+    <meta property="og:title" content="AI Traffic Controller" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="Traffic controller simulation controlled by AI." />
+    <meta property="og:image" content="https://traffic-controller.onrender.com/static/img/WebsitePreview_Meta" />
+    <meta property="og:url" content="https://traffic-controller.onrender.com/" />
+    <meta property="og:site_name" content="traffic-controller.onrender.com" />
+
+    <!-- TWITTER META'S -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="traffic-controller.onrender.com">
+    <meta property="twitter:url" content="https://traffic-controller.onrender.com/">
+    <meta name="twitter:title" content="AI Traffic Controller">
+    <meta name="twitter:description" content="Traffic controller simulation controlled by AI.">
+    <meta name="twitter:image" content="https://traffic-controller.onrender.com/static/img/WebsitePreview_Meta">
+  
+
+    <!-- My Links -->
+    <link rel="icon" type="image/png" href="static/img/WebsitePreview_Meta.png"/>
+    <link rel="stylesheet" href="static/css/splash.css"/>
+    <link rel="stylesheet" href="static/css/style.css"/>
+
+    <!-- External Links -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    /* Ensure the content is properly spaced on all devices */
-    .container {
-      margin-top: 20px;
-    }
-
-    .controls {
-      background-color: rgba(255, 255, 255, 0.8); /* Slight transparency to let the background show through */
-      padding: 20px;
-      border-radius: 8px;
-      width: 100%; /* Make it responsive */
-    }
-
-    h3 {
-      font-size: 1.5rem;
-    }
-
-    /* Make font size smaller on mobile */
-    @media (max-width: 768px) {
-      h3 {
-        font-size: 1.2rem;
-      }
-
-      .controls {
-        padding: 15px;
-      }
-
-      .btn {
-        width: 100%; /* Make buttons take up full width on mobile */
-      }
-      .canvas-wrapper canvas {
-        width: 100%;  /* Make it fit within its container */
-        height: auto; /* Maintain aspect ratio */
-      }
-    }
-
-    /* Additional responsive adjustments for layout */
-    .row {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .col-md-6 {
-      width: 100%; /* Allow columns to stack on smaller screens */
-    }
-
+  <style>
+    
   </style>
 </head>
-<body class="d-flex align-items-center min-vh-100">
+<body>
     <!-- Splash screen -->
     <div id="loading-splash" class="loading-splash">
         <div class="loading-message">
-            <p>Training Traffic_Light AI . . .</p>
+            <p>Training AI . . .</p>
         </div>
     </div>
 
-    <div class="container d-flex justify-content-center">
-        <div class="row">
-            <!-- Canvas Column -->
-            <div class="col-12 col-md-6 d-flex justify-content-center align-items-center mb-4">
-                <div class="canvas-wrapper">
-                    <canvas id="gameCanvas" width="800" height="800"></canvas>
-                </div>
-            </div>
+    <div class="container">
 
-            <!-- Controls and About Column -->
-            <div class="col-12 col-md-6 d-flex justify-content-center align-items-center">
-                <div class="controls">
-                    <h3>Traffic Controls</h3>
-                    <button class="btn btn-primary mb-2" onclick="changeLight()">Change Light</button>
-                    <button class="btn btn-success mb-2" onclick="addCar()">Add Random Car</button>
-                    <button class="btn btn-secondary mb-2" onclick="togglePause()">Pause/Resume</button>
-
-
-                    <h3>About this Neural Network</h3>
-                    <p>
-                        <strong>Optimizing Traffic Flow:</strong><br>
-                        This neural network is designed to optimize <em>traffic light control</em> at intersections by intelligently adjusting traffic light states based on real-time data. It analyzes factors like the number of cars waiting at red and green lights and the time elapsed since the last light change.
-                    </p>
-                    <p>
-                        <strong>How It Works:</strong><br>
-                        The model continuously collects data from traffic sensors installed at the intersection. By learning from historical traffic data, it predicts the most efficient traffic light state that minimizes congestion and wait times. The goal is to improve traffic flow, reduce delays, and ensure a smooth driving experience for commuters.
-                    </p>
-                    <p>
-                        <strong>Real-Time Predictions:</strong><br>
-                        Each prediction is made in real-time, adjusting the traffic light states dynamically based on current traffic conditions. As more data is fed into the system, the model becomes increasingly accurate, learning to make better decisions and optimize traffic flow even further.
-                    </p>
-                    <p>
-                        <strong>Key Benefits:</strong><br>
-                        <ul>
-                            <li><strong>Reduced Congestion:</strong> Less time spent waiting at lights.</li>
-                            <li><strong>Optimized Traffic Flow:</strong> Fewer stop-and-go situations, smoother driving.</li>
-                            <li><strong>Real-Time Adjustments:</strong> The system responds to changing traffic patterns instantly.</li>
-                            <li><strong>Environmental Benefits:</strong> Reduced fuel consumption and emissions due to optimized traffic control.</li>
-                        </ul>
-                    </p>
-                    <p>
-                        This AI-powered traffic light system continues to evolve and improve as it receives more data. It is trained to handle complex, real-world scenarios, ensuring the best possible outcomes for traffic management and city infrastructure.
-                    </p>
-                    
-                </div>
+        <div class="controls">
+            <h2><strong>Controls</strong></h2>
+            <div class="button-group">
+                <button class="btn btn-primary mb-2" onclick="changeLight()" aria-label="Change Traffic Light">Change Light</button>
+                <button class="btn btn-primary mb-2" onclick="addCar()" aria-label="Add Car">Add Car</button>
+                <button class="btn btn-primary mb-2" onclick="togglePause()" aria-label="Pause/Resume Simulation">Pause/Resume</button>                
             </div>
         </div>
-    </div>
 
+        <!-- Canvas -->
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="800" height="800"></canvas>
+        </div>
+
+        <!-- Controls and About Section -->
+        <div class="about">
+            <h1>About the Traffic-Controller System</h1>
+            
+            <!-- Overview Section -->
+            <h2>Overview</h2>
+            <p>
+                This AI-driven system optimizes <em>traffic light timing</em> to improve traffic 
+                flow at intersections. By analyzing real-time data, such as the number of cars
+                waiting at signals and the time elapsed since the last light change, it reduces 
+                congestion and enhances traffic efficiency.
+            </p>
+            
+            <!-- How It Works Section -->
+            <h2>How It Works</h2>
+            <p>
+                The system collects real-time data from traffic sensors at the intersection 
+                and uses a neural network to predict whether or not the traffic lights should 
+                change, based on the training data it learned from. By continuously analyzing 
+                current traffic conditions, the AI dynamically adjusts the traffic light to 
+                optimize flow, reduce congestion, and adapt to changing traffic patterns.
+                <br><br>
+                <strong>Note:</strong> To minimize network strain 
+                and ensure optimal system performance, API calls to the neural network are made every 5 seconds.
+            </p>                  
+            
+            <!--AI Algorithms and Specifics -->
+            <h2>AI Training and Learning</h2>
+            <p>
+                The AI system is trained using a dataset of historical traffic patterns. 
+                During training, the neural network employs 
+                <a href="https://en.wikipedia.org/wiki/Supervised_learning">Supervised Learning</a> 
+                with <a href="https://en.wikipedia.org/wiki/Binary_classification">Binary Classification</a> 
+                to understand how different traffic conditions influence optimal light timings. 
+                The model uses activation functions like 
+                <a href="https://en.wikipedia.org/wiki/Rectifier_(neural_networks)">ReLU</a> for hidden layers 
+                and <a href="https://en.wikipedia.org/wiki/Sigmoid_function">Sigmoid</a> for
+                the output layer, enabling it to make binary predictions. The training process also uses 
+                <a href="https://www.geeksforgeeks.org/binary-cross-entropy-log-loss-for-binary-classification/">
+                Binary Cross-Entropy</a> as the loss function to optimize the model's performance. 
+                Once trained, the model is used to predict whether or not to change the light, based on 
+                real-time traffic data.
+            </p>                                                          
+        
+            <!-- Car Movement and Spawning -->
+            <h2>How Cars Spawn and Move</h2>
+            <p>
+                Cars are randomly generated at the edges of the intersection and move according to 
+                the traffic light signals. You can also spawn a car using the <i>manual controls</i>. 
+                If a car enters the intersection just as the light turns red, it will accelerate
+                to exit the intersection faster.
+            </p>
+            
+            
+            <!-- Manual Controls -->
+            <h2>Manual Controls</h2>
+            <ul>
+                <li><strong>Change Light:</strong> Click to cycle through the red and green lights, manually controlling traffic flow.</li>
+                <li><strong>Add Car:</strong> Click to spawn a new car at a random edge of the intersection.</li>
+                <li><strong>Pause/Resume:</strong> Pause or resume the simulation to observe traffic flow changes.</li>
+            </ul>
+            
+            <!-- Key Benefits Section -->
+            <h2>Key Benefits</h2>
+            <ul>
+                <li><strong>Reduced Congestion:</strong> Shorter wait times at red lights, improving traffic flow.</li>
+                <li><strong>Smoother Driving:</strong> Fewer stop-and-go situations, resulting in a more pleasant driving experience.</li>
+                <li><strong>Adaptive to Traffic Fluctuations:</strong> Instant adjustments to changing traffic conditions for maximum efficiency.</li>
+                <li><strong>Environmental Impact:</strong> Optimized traffic management reduces fuel consumption and emissions.</li>
+            </ul>
+            
+            <!-- Closing Section -->
+            <p>
+                As the AI continues to learn from each data point, the system becomes smarter, 
+                driving even more efficient and adaptive traffic control, transforming how 
+                intersections are managed.
+            </p>
+
+            <!-- Credits Section -->
+            <h2>Credits</h2>
+            <p>
+                This Traffic Light Simulation and AI Controller was created by 
+                <strong><a href="https://github.com/JBratvold" target="_blank">JBratvold</a></strong>. 
+                You can explore the source code and contribute to the project on my GitHub.
+            </p>
+        </div>
+    </div>
     <script src="/static/js/trafficController.js"></script>
     <script src="/static/js/splash.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
