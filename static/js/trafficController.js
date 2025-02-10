@@ -22,13 +22,11 @@ let lightStateEW = "green";
 let lightStateNS = "red";
 let cars = [];
 let predictionToChange = true;
+let paused = false; // Flag to track if the simulation is paused
 
 
 
-// Update the timer every second
-setInterval(() => {
-    secondsSinceLightChange++;
-}, 1000);
+
 
 // Define car spawn zones for each direction
 const spawnZones = {
@@ -201,73 +199,73 @@ function drawCars() {
 
 // Update car positions
 function updateCars() {
-  cars.forEach(car => {
-
-    // Check for collisions with other cars
-    for (const carBehind of cars) {
-        if (carBehind !== car && car.isCollidingWith(carBehind)) {
-            car.speed = 0;
-            break; // Stop checking further cars if a collision is found
-        } 
-        else {
-            car.speed = 2;
-        }
-    }
-
-    if (lightStateEW === "green" ) { //EW Green Lights
-      if (car.direction === "east") {
-        car.resume();
-        car.x -= car.speed;
-      }  
-      if (car.direction === "west") {
-        car.resume();
-        car.x += car.speed; 
-      }
-      if (car.direction === "north") { //North=RED Light
-        if (car.y > NORTH_STOP_LINE_Y - 19) {
-            car.y += car.speed + CAR_BOOST_THROUGH_INTERSECTION;
-        } else if (car.y < NORTH_STOP_LINE_Y - 20) {
-            car.y += car.speed;
-        }
-      }
-      if (car.direction === "south") {//South=RED Light
-        if(car.y < SOUTH_STOP_LINE_Y) {
-            car.y -= car.speed+CAR_BOOST_THROUGH_INTERSECTION; 
-        } else if (car.y > SOUTH_STOP_LINE_Y) {
-            car.y -= car.speed; 
-        }
-      }
-    } else {
-        if (car.direction === "east") { //EAST=RED Light
-            if (car.x < EAST_STOP_LINE_X) {
-                car.x -= car.speed+CAR_BOOST_THROUGH_INTERSECTION;
-            } else if (car.x > EAST_STOP_LINE_X+1) {
-                car.x -= car.speed; 
+    if (!paused) { // Only update cars if not paused
+        cars.forEach(car => {
+            // Check for collisions with other cars
+            for (const carBehind of cars) {
+                if (carBehind !== car && car.isCollidingWith(carBehind)) {
+                    car.speed = 0;
+                    break; // Stop checking further cars if a collision is found
+                } else {
+                    car.speed = 2;
+                }
             }
-        }
-        if (car.direction === "west") { //West=RED Light
-            if (car.x > WEST_STOP_LINE_X-19) { 
-                car.x += car.speed+CAR_BOOST_THROUGH_INTERSECTION; //Passed the stop line (light is red)
-            } else if (car.x < WEST_STOP_LINE_X-20) { 
-                car.x += car.speed; //Approaching stop line (light is red)
-            } else if (car.x >= WEST_STOP_LINE_X-20){ 
-                //At the stop line (light is red)
+
+            // Traffic light logic here
+            if (lightStateEW === "green") {
+                if (car.direction === "east") {
+                    car.resume();
+                    car.x -= car.speed;
+                }
+                if (car.direction === "west") {
+                    car.resume();
+                    car.x += car.speed;
+                }
+                if (car.direction === "north") { // North = RED light
+                    if (car.y > NORTH_STOP_LINE_Y - 19) {
+                        car.y += car.speed + CAR_BOOST_THROUGH_INTERSECTION;
+                    } else if (car.y < NORTH_STOP_LINE_Y - 20) {
+                        car.y += car.speed;
+                    }
+                }
+                if (car.direction === "south") { // South = RED light
+                    if (car.y < SOUTH_STOP_LINE_Y) {
+                        car.y -= car.speed + CAR_BOOST_THROUGH_INTERSECTION;
+                    } else if (car.y > SOUTH_STOP_LINE_Y) {
+                        car.y -= car.speed;
+                    }
+                }
             } else {
-                //Should never arrive here
+                if (car.direction === "east") { // East = RED light
+                    if (car.x < EAST_STOP_LINE_X) {
+                        car.x -= car.speed + CAR_BOOST_THROUGH_INTERSECTION;
+                    } else if (car.x > EAST_STOP_LINE_X + 1) {
+                        car.x -= car.speed;
+                    }
+                }
+                if (car.direction === "west") { // West = RED light
+                    if (car.x > WEST_STOP_LINE_X - 19) {
+                        car.x += car.speed + CAR_BOOST_THROUGH_INTERSECTION;
+                    } else if (car.x < WEST_STOP_LINE_X - 20) {
+                        car.x += car.speed;
+                    } else if (car.x >= WEST_STOP_LINE_X - 20) {
+                        // At the stop line (light is red)
+                    } else {
+                        // Should never arrive here
+                    }
+                }
+                if (car.direction === "north") { // North = Green light
+                    car.resume();
+                    car.y += car.speed;
+                }
+                if (car.direction === "south") { // South = Green light
+                    car.resume();
+                    car.y -= car.speed;
+                }
             }
-        }
-      if (car.direction === "north") {//North=Green Light
-        car.resume();
-        car.y += car.speed; 
-      }
-      if (car.direction === "south") {//South=Green Light  
-        car.resume();
-        car.y -= car.speed; 
-      }
+        });
     }
-  });
 }
-
 
 
 // Count cars heading east/west and north/south that have not crossed the intersection stop lines.
@@ -332,21 +330,25 @@ function update() {
 
 // Toggle light state
 function changeLight() {
-  if (lightStateEW === "green") {
-    lightStateEW = "red";
-    lightStateNS = "green";
-  } else {
-    lightStateEW = "green";
-    lightStateNS = "red";
-  }
-
-  secondsSinceLightChange = 0; // Reset timer when lights change
+    if(!paused) {
+        if (lightStateEW === "green") {
+            lightStateEW = "red";
+            lightStateNS = "green";
+          } else {
+            lightStateEW = "green";
+            lightStateNS = "red";
+          }
+        
+          secondsSinceLightChange = 0; // Reset timer when lights change
+    }
 }
 
 // Add a random car
 function addCar() {
-  const randomDirection = ["east", "west", "north", "south"][Math.floor(Math.random() * 4)];
-  addCarFrom(randomDirection);
+    if (!paused) {
+        const randomDirection = ["east", "west", "north", "south"][Math.floor(Math.random() * 4)];
+        addCarFrom(randomDirection);
+    }
 }
 
 // Check if the new car's area is clear (at least 1px distance from any existing car)
@@ -457,6 +459,20 @@ function sendTrafficDataToBackend() {
 
     console.log("Data sent:".data)
 }
+
+// Function to toggle the paused state
+function togglePause() {
+    paused = !paused;
+}
+
+
+// Intervals
+// Update the timer every second
+let timerInterval = setInterval(() => {
+    if (!paused) { // Only update time if not paused
+        secondsSinceLightChange++;
+    }
+}, 1000);
 
 setInterval(addCar,2000);
 setInterval(sendTrafficDataToBackend,5000);
