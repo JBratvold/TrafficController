@@ -272,8 +272,8 @@ function countCars() {
   }).length;
 
     // Set font and style
-    ctx.font = "25px 'Roboto', sans-serif";
-    ctx.fillStyle = "white";  // Change color as needed
+    ctx.font = "25px sans-serif";
+    ctx.fillStyle = "Red";  // Change color as needed
 
     // Draw the counts on the canvas
     ctx.fillText(`${eastWestCount}`, 10, 30);  // Positioning (x, y)
