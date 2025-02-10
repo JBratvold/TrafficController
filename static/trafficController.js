@@ -11,6 +11,8 @@ const DIVIDER_COLOUR = "orange";
 const STOP_LINE_COLOUR = "white";
 const DASHED_LANE_COLOUR = "darkgrey";
 
+const CAR_BOOST_THROUGH_INTERSECTION = 12;
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 let secondsSinceLightChange = 0; // Track seconds since last light change
@@ -223,14 +225,14 @@ function updateCars() {
       }
       if (car.direction === "north") { //North=RED Light
         if (car.y > NORTH_STOP_LINE_Y - 19) {
-            car.y += car.speed + 15;
+            car.y += car.speed + CAR_BOOST_THROUGH_INTERSECTION;
         } else if (car.y < NORTH_STOP_LINE_Y - 20) {
             car.y += car.speed;
         }
       }
       if (car.direction === "south") {//South=RED Light
         if(car.y < SOUTH_STOP_LINE_Y) {
-            car.y -= car.speed+15; 
+            car.y -= car.speed+CAR_BOOST_THROUGH_INTERSECTION; 
         } else if (car.y > SOUTH_STOP_LINE_Y) {
             car.y -= car.speed; 
         }
@@ -238,14 +240,14 @@ function updateCars() {
     } else {
         if (car.direction === "east") { //EAST=RED Light
             if (car.x < EAST_STOP_LINE_X) {
-                car.x -= car.speed+15;
+                car.x -= car.speed+CAR_BOOST_THROUGH_INTERSECTION;
             } else if (car.x > EAST_STOP_LINE_X+1) {
                 car.x -= car.speed; 
             }
         }
         if (car.direction === "west") { //West=RED Light
             if (car.x > WEST_STOP_LINE_X-19) { 
-                car.x += car.speed+15; //Passed the stop line (light is red)
+                car.x += car.speed+CAR_BOOST_THROUGH_INTERSECTION; //Passed the stop line (light is red)
             } else if (car.x < WEST_STOP_LINE_X-20) { 
                 car.x += car.speed; //Approaching stop line (light is red)
             } else if (car.x >= WEST_STOP_LINE_X-20){ 
@@ -459,5 +461,6 @@ function sendTrafficDataToBackend() {
     console.log("Data sent:".data)
 }
 
+setInterval(addCar,2000);
 setInterval(sendTrafficDataToBackend,5000);
 setInterval(update, 50);
