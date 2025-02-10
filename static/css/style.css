@@ -1,0 +1,91 @@
+/* Set the background image for the body */
+body {
+    background-image: url('../img/background.png');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    image-rendering: crisp-edges;
+}
+
+/* Center everything in a stacked format */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+/* Canvas Wrapper */
+.canvas-wrapper {
+  margin: 5px;
+  height: 100%;
+  width: 100%;
+  max-width: 800px; /* Limit to 800px on larger screens */
+}
+
+/* Set default size for the canvas */
+#gameCanvas {
+  width: 800px;
+  height: 800px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center; /* Centers buttons horizontally */
+    gap: 10px; /* Adds spacing between buttons */
+    flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
+
+.about,.controls {
+  background-color: rgba(255, 255, 255, 0.75);
+  padding: 15px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.controls {
+    text-align: center;
+}
+
+ul {
+    list-style-type: square;
+}
+
+/* Make font size smaller on mobile */
+@media (max-width: 768px) {
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  .controls {
+    padding: 15px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  /* Canvas adjustments for smaller screens */
+  .canvas-wrapper {
+    max-width: 100%; /* Use full width on smaller screens */
+  }
+
+  /* Adjust canvas size for smaller screens */
+  #gameCanvas {
+    width: 100%;   /* Make the canvas width 100% of the container */
+    height: auto;  /* Adjust height to maintain aspect ratio */
+  }
+}
+
+@media (max-width: 480px) {
+  /* Further adjust canvas size for very small screens */
+  #gameCanvas {
+    width: 100%;   /* Full width */
+    height: auto;  /* Maintain aspect ratio */
+  }
+}
