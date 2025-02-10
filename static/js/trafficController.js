@@ -301,22 +301,19 @@ function countCars() {
     return false;
   }).length
 
-
     // Set font and style
-    ctx.font = "25px sans-serif";
-    ctx.fillStyle = "Red";  // Change color as needed
+    ctx.font = "bold 28px sans-serif";
+    ctx.fillStyle = "Black";  // Change color as needed
+    
     
     // Draw the counts on the canvas
-    ctx.fillText(`${redLightCarsCount}`, 10, 30);  // Positioning (x, y)
-    ctx.fillText(`${greenLightCarsCount}`, 10, 60); // Positioning (x, y)
-    ctx.fillText(`${secondsSinceLightChange}`, 10, 90); // Positioning (x, y)
-    ctx.fillText(`(Red Light Cars)`, 60, 30);  // New position (x, y)
-    ctx.fillText(`(Green Light Cars)`, 60, 60);  // New position (x, y)
-    ctx.fillText(`(Seconds)`, 60, 90);  // New position (x, y)
+    ctx.fillText(`${redLightCarsCount}`, 20, 150);  // Positioning (x, y)
+    ctx.fillText(`${greenLightCarsCount}`, 20, 180); // Positioning (x, y)
+    ctx.fillText(`${secondsSinceLightChange}`, 20, 210); // Positioning (x, y)
+    ctx.fillText(`Red Light Cars`, 70, 150);  // New position (x, y)
+    ctx.fillText(`Green Light Cars`, 70, 180);  // New position (x, y)
+    ctx.fillText(`Seconds`, 70, 210);  // New position (x, y)
 
-
-
-  
 //   console.log("East-West count (not in intersection):", eastWestCount);
 //   console.log("North-South count (not in intersection):", northSouthCount);
 }
