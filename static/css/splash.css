@@ -15,7 +15,7 @@
 
 /* Styling for the message */
 .loading-message p {
-    font-size: 50px;
+    font-size: 5vw; /* Relative font size based on viewport width */
     color: white;
     font-weight: bold;
     text-align: center;
@@ -24,10 +24,17 @@
 
 /* Animation for the fade-in effect */
 @keyframes fadeIn {
-0% {
-    opacity: 0;
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
-100% {
-    opacity: 1;
-}
+
+/* Additional media query for very small screens */
+@media (max-width: 480px) {
+    .loading-message p {
+        font-size: 8vw;  /* Increase font size on very small screens */
+    }
 }
