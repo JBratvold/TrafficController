@@ -279,17 +279,37 @@ function countCars() {
     return false;
   }).length;
 
+
+  const redLightCarsCount = cars.filter(car => {
+    if (car.direction === "north" && car.y <= NORTH_STOP_LINE_Y && lightStateNS === "red") return true;
+    if (car.direction === "south" && car.y >= SOUTH_STOP_LINE_Y && lightStateNS === "red") return true;
+    if (car.direction === "east" && car.x >= EAST_STOP_LINE_X && lightStateEW === "red") return true;
+    if (car.direction === "west" && car.x <= WEST_STOP_LINE_X && lightStateEW === "red") return true;
+    return false;
+  }).length
+
+  const greenLightCarsCount = cars.filter(car => {
+    if (car.direction === "north" && car.y <= NORTH_STOP_LINE_Y && lightStateNS === "green") return true;
+    if (car.direction === "south" && car.y >= SOUTH_STOP_LINE_Y && lightStateNS === "green") return true;
+    if (car.direction === "east" && car.x >= EAST_STOP_LINE_X && lightStateEW === "green") return true;
+    if (car.direction === "west" && car.x <= WEST_STOP_LINE_X && lightStateEW === "green") return true;
+    return false;
+  }).length
+
+
     // Set font and style
     ctx.font = "25px sans-serif";
     ctx.fillStyle = "Red";  // Change color as needed
     
     // Draw the counts on the canvas
-    ctx.fillText(`${eastWestCount}`, 10, 30);  // Positioning (x, y)
-    ctx.fillText(`${northSouthCount}`, 10, 60); // Positioning (x, y)
+    ctx.fillText(`${redLightCarsCount}`, 10, 30);  // Positioning (x, y)
+    ctx.fillText(`${greenLightCarsCount}`, 10, 60); // Positioning (x, y)
     ctx.fillText(`${secondsSinceTraffic}`, 10, 90); // Positioning (x, y)
-    ctx.fillText(`East/West`, 60, 30);  // New position (x, y)
-    ctx.fillText(`North/South`, 60, 60);  // New position (x, y)
-    ctx.fillText(`Last Light Change`, 60, 90);  // New position (x, y)
+    ctx.fillText(`(Red Light Cars)`, 60, 30);  // New position (x, y)
+    ctx.fillText(`(Green Light Cars)`, 60, 60);  // New position (x, y)
+    ctx.fillText(`(Seconds)`, 60, 90);  // New position (x, y)
+
+
 
   
 //   console.log("East-West count (not in intersection):", eastWestCount);
@@ -404,6 +424,7 @@ for (const direction in spawnZones) {
     }
 }
 });
+
 
 
 setInterval(update, 50);
