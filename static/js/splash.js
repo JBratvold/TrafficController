@@ -11,4 +11,4 @@ function hideLoadingSplash() {
 // Example: Show splash when the network starts training
 showLoadingSplash();
 
-setTimeout(hideLoadingSplash, 1200); // Hide after 2 seconds for demo purposes
+setTimeout(hideLoadingSplash, 2000); // Hide after 2 seconds for demo purposes
