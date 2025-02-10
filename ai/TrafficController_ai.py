@@ -95,6 +95,13 @@ raw_training_data = np.array([
     [3, 22, 11, 0],
     [5, 15, 30, 0],
     [7, 15, 40, 1],
+    [3, 0, 5, 1],
+    [0, 0, 75, 0],
+    [1, 0, 5, 1],
+    [2, 0, 2, 1],
+    [2, 0, 20, 1],
+    [4, 0, 15, 1],
+    [1, 0, 2, 1],
 ])
 
 X,Y = splitIntoXY(raw_training_data,INDEX_TO_SPLIT_X_AND_Y)
