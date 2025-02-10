@@ -3,43 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="static/css/splash.css">
   <title>Traffic Light Simulation</title>
-    
+  <style>
+
+
+
+
+  </style>
 </head>
 <body>
-
-  <div class="container">
-    <canvas id="gameCanvas" width="800" height="800"></canvas>
-    
-    <!-- Button container placed horizontally beside each other -->
-    <div class="button-container">
-      <button onclick="changeLight()">Change Light 🚦</button>
-      <button onclick="addCar()">Add Random Car 🚗</button>
+    <!-- Splash screen -->
+    <div id="loading-splash" class="loading-splash">
+        <div class="loading-message">
+            <p>Training Traffic_Light AI . . .</p>
+        </div>
     </div>
 
-    <!-- Explanation of the neural network control -->
-    <div class="text-container">
-        <h2>Traffic Light Simulation</h2>
-      <p>
-        This website simulates the control of traffic lights at an intersection using an AI-driven system. 
-        Users can interact with the traffic light by manually changing its state or observing the AI in action as it controls the traffic flow in real time.
-      </p>
-      <h2>How the Traffic Light is Controlled</h2>
-      <p>
-        The traffic light in this simulation is controlled by a custom-built neural network, which is trained to manage the flow of traffic at an intersection. 
-        The neural network takes in various inputs such as the number of cars waiting at each light. 
-        Based on this information, the network dynamically adjusts the light phases to optimize the flow of traffic.
-      </p>
-      <p>
-        This neural network is capable of learning and adapting to different traffic patterns, making decisions that would otherwise require human intervention. 
-        Over time, it gets better at managing traffic efficiently by responding to the real-time conditions of the intersection.
-      </p>
+    <div class="container">
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="800" height="800"></canvas>
+        </div>
+        
+        <div class="controls">
+            <h3>Traffic Controls</h3>
+            <button onclick="changeLight()">Change Light</button>
+            <button onclick="addCar()">Add Random Car</button>
+
+            <h3>About this Neural Network</h3>
+            <p>
+                This neural network is designed to optimize traffic light control at an intersection. By analyzing data such as the number of cars waiting at red and green lights, and the time since the last light change, the model predicts the best traffic light state to improve traffic flow. The goal is to reduce congestion, minimize wait times, and enhance overall traffic efficiency.
+                The model was trained using historical traffic data, and its predictions are made in real-time as new data is provided by sensors at the intersection.
+            </p>
+        </div>
     </div>
-  </div>
 
-
-  <!-- External JavaScript -->
-  <script src="/static/trafficController.js"></script>
-    
+    <script src="/static/js/trafficController.js"></script>
+    <script src="/static/js/splash.js"></script>
 </body>
 </html>
