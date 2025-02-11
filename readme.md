@@ -3,7 +3,7 @@
 A Flask web application that uses a neural network (`queryNN`) to predict traffic light changes based on real-time car data at an intersection.
 
 A live instance of this project can be viewed at:  
-[View Live Instance](https://traffic-controller.onrender.com)
+[Traffic-Controller](https://traffic-controller.onrender.com)
 
 ---
 
@@ -23,7 +23,6 @@ A live instance of this project can be viewed at:
 
 ```bash
 git clone https://github.com/JBratvold/TrafficController
-cd your-repo
 ```
 
 ### **2️⃣ Install Dependencies**
