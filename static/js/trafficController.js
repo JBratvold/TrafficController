@@ -6,6 +6,7 @@ const SOUTH_STOP_LINE_Y = 480;
 const EAST_STOP_LINE_X = 480;
 const WEST_STOP_LINE_X = 320;
 
+// Colour constants
 const ROAD_COLOUR = "grey";
 const DIVIDER_COLOUR = "orange";
 const STOP_LINE_COLOUR = "white";
@@ -23,10 +24,6 @@ let lightStateNS = "red";
 let cars = [];
 let predictionToChange = true;
 let paused = false; // Flag to track if the simulation is paused
-
-
-
-
 
 // Define car spawn zones for each direction
 const spawnZones = {
@@ -103,7 +100,6 @@ function drawRoadLines() {
     drawSolidLine(480, 340, 480, 460, STOP_LINE_COLOUR, 6);
 }
 
-
 function drawSpawnZones() {
     // Inner Function to draw the car spawn locations
     function drawSpawnRect(x, y, width, height) {
@@ -154,7 +150,6 @@ function drawTrafficLights() {
     });
 }
 
-
 class Car {
     static idCounter = 1;
     static colors = ["red", "blue", "green", "yellow", "purple", "orange"];
@@ -177,8 +172,8 @@ class Car {
     }
 
     resume() {
-        this.isStopped = false; // Mark the car as not stopped
-        this.speed = 2; // Set the car's speed back to a default value (or original speed)
+        this.isStopped = false; 
+        this.speed = 2; 
     }
 
     // Collision check method
@@ -200,7 +195,7 @@ function drawCars() {
 // Update car positions
 function updateCars() {
     if (!paused) { // Only update cars if not paused
-        cars.forEach(car => {
+        cars = cars.filter(car => {
             // Check for collisions with other cars
             for (const carBehind of cars) {
                 if (carBehind !== car && car.isCollidingWith(carBehind)) {
@@ -263,10 +258,11 @@ function updateCars() {
                     car.y -= car.speed;
                 }
             }
+            // Remove cars that exit the canvas
+            return car.x >= 0 && car.x <= CANVAS_MAX && car.y >= 0 && car.y <= CANVAS_MAX;
         });
     }
 }
-
 
 // Count cars heading east/west and north/south that have not crossed the intersection stop lines.
 function countCars() {
@@ -303,17 +299,13 @@ function countCars() {
     ctx.font = "bold 28px sans-serif";
     ctx.fillStyle = "Black";  // Change color as needed
     
-    
     // Draw the counts on the canvas
-    ctx.fillText(`${redLightCarsCount}`, 20, 150);  // Positioning (x, y)
-    ctx.fillText(`${greenLightCarsCount}`, 20, 180); // Positioning (x, y)
-    ctx.fillText(`${secondsSinceLightChange}`, 20, 210); // Positioning (x, y)
-    ctx.fillText(`Red Light Cars`, 70, 150);  // New position (x, y)
-    ctx.fillText(`Green Light Cars`, 70, 180);  // New position (x, y)
-    ctx.fillText(`Seconds`, 70, 210);  // New position (x, y)
-
-//   console.log("East-West count (not in intersection):", eastWestCount);
-//   console.log("North-South count (not in intersection):", northSouthCount);
+    ctx.fillText(`${redLightCarsCount}`, 20, 150); 
+    ctx.fillText(`${greenLightCarsCount}`, 20, 180);
+    ctx.fillText(`${secondsSinceLightChange}`, 20, 210); 
+    ctx.fillText(`Red Light Cars`, 70, 150);  
+    ctx.fillText(`Green Light Cars`, 70, 180); 
+    ctx.fillText(`Seconds`, 70, 210);  
 }
 
 // Main update loop
@@ -338,7 +330,6 @@ function changeLight() {
             lightStateEW = "green";
             lightStateNS = "red";
           }
-        
           secondsSinceLightChange = 0; // Reset timer when lights change
     }
 }
@@ -416,15 +407,16 @@ const canvasY = pageY - top;
 // Loop through spawn zones
 for (const direction in spawnZones) {
     for (const zone of spawnZones[direction]) {
-    const [xMin, xMax] = zone.xRange;
-    const [yMin, yMax] = zone.yRange;
 
-    // Check if click is within the spawn zone
-    if (canvasX >= xMin && canvasX <= xMax && canvasY >= yMin && canvasY <= yMax) {
-        const [spawnX, spawnY] = zone.spawnPoint;
-        addCarFrom(direction, spawnX, spawnY);
-        return;
-    }
+        const [xMin, xMax] = zone.xRange;
+        const [yMin, yMax] = zone.yRange;
+
+        // Check if click is within the spawn zone
+        if (canvasX >= xMin && canvasX <= xMax && canvasY >= yMin && canvasY <= yMax) {
+            const [spawnX, spawnY] = zone.spawnPoint;
+            addCarFrom(direction, spawnX, spawnY);
+            return;
+        }
     }
 }
 });
@@ -433,8 +425,8 @@ for (const direction in spawnZones) {
 function sendTrafficDataToBackend() {
     // Prepare the traffic data to be sent
     const trafficData = {
-        red: redLightCarsCount,  // Number of cars at a red light (East-West)
-        green: greenLightCarsCount,  // Number of cars at a green light (North-South)
+        red: redLightCarsCount,  // Number of cars at a red light
+        green: greenLightCarsCount,  // Number of cars at a green light 
         seconds: secondsSinceLightChange  // Time since the last light change
     };
 
@@ -448,8 +440,7 @@ function sendTrafficDataToBackend() {
     })
     .then(response => response.json())
     .then(data => {
-        // console.log("Received prediction:", data.prediction);
-        // You can use the prediction to update the traffic light or log it
+        // Update the traffic light
         if(data.prediction === 1) changeLight();
         
     })
@@ -462,7 +453,6 @@ function sendTrafficDataToBackend() {
 function togglePause() {
     paused = !paused;
 }
-
 
 // Intervals
 // Update the timer every second
